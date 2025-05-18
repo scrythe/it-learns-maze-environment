@@ -1,2 +1,3 @@
-# improved-maze-ai
-improved version of maze ai 
+# it-learns-mazes-environment
+
+maze environment of it learns mazes

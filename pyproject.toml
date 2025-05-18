@@ -1,0 +1,7 @@
+[project]
+name = "it-learns-mazes-environment"
+version = "0.0.1"
+dependencies = [
+  "gymnasium",
+  "pygame>=2.1.3",
+]
