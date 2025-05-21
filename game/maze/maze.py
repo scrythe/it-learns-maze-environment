@@ -12,6 +12,37 @@ class Direction(Enum):
 
 def generate_maze_structure(size: int):
     maze_graph = generate_maze_graph(size)
+    maze_structure = convert_graph_to_structure(maze_graph, size)
+    for row in maze_structure:
+        print(row)
+
+
+def convert_graph_to_structure(maze_graph: npt.NDArray, size: int):
+    structure_size = size * 2 + 1
+    maze_structure = np.zeros((structure_size, structure_size), dtype=np.int32)
+    # set_borders(maze_structure)
+    prev_cell_pos = maze_graph[0] * 2 + 1
+    for cell in maze_graph:
+        cell_pos = cell * 2 + 1
+        maze_structure[cell_pos[1], cell_pos[0]] = 1
+        if (cell == -1).all():
+            prev_cell_pos = cell
+            continue
+        if (prev_cell_pos == -1).all():
+            prev_cell_pos = cell_pos
+            continue
+        between_cell_pos = (cell_pos - prev_cell_pos) // 2
+        between_cell_pos = prev_cell_pos + between_cell_pos
+        maze_structure[between_cell_pos[1], between_cell_pos[0]] = 1
+        prev_cell_pos = cell_pos
+    return maze_structure
+
+
+def set_borders(empty_maze_structure):
+    empty_maze_structure[0] = 1
+    empty_maze_structure[-1] = 1
+    empty_maze_structure[:, 0] = 1
+    empty_maze_structure[:, -1] = 1
 
 
 def generate_maze_graph(size: int):
@@ -59,7 +90,7 @@ def generate_maze_graph(size: int):
             )
             current_cell = new_cell
             if check_cell_inside_list(visited_cells, new_cell):
-                maze_graph[current_cell_index] = [-1, -1]
+                maze_graph[current_cell_index] = -1
                 current_cell_index += 1
                 break
     return maze_graph
@@ -133,4 +164,4 @@ def cell_goto_direction(current_cell: npt.NDArray, direction: Direction):
 
 
 if __name__ == "__main__":
-    generate_maze_graph(10)
+    generate_maze_structure(10)
