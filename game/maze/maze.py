@@ -13,14 +13,12 @@ class Direction(Enum):
 def generate_maze_structure(size: int):
     maze_graph = generate_maze_graph(size)
     maze_structure = convert_graph_to_structure(maze_graph, size)
-    for row in maze_structure:
-        print(row)
+    return maze_structure
 
 
 def convert_graph_to_structure(maze_graph: npt.NDArray, size: int):
     structure_size = size * 2 + 1
     maze_structure = np.zeros((structure_size, structure_size), dtype=np.int32)
-    # set_borders(maze_structure)
     prev_cell_pos = maze_graph[0] * 2 + 1
     for cell in maze_graph:
         if (cell == -1).all():
@@ -36,13 +34,6 @@ def convert_graph_to_structure(maze_graph: npt.NDArray, size: int):
         maze_structure[between_cell_pos[1], between_cell_pos[0]] = 1
         prev_cell_pos = cell_pos
     return maze_structure
-
-
-def set_borders(empty_maze_structure):
-    empty_maze_structure[0] = 1
-    empty_maze_structure[-1] = 1
-    empty_maze_structure[:, 0] = 1
-    empty_maze_structure[:, -1] = 1
 
 
 def generate_maze_graph(size: int):
@@ -69,7 +60,7 @@ def generate_maze_graph(size: int):
             current_cell_index,
             visited_cells_index,
         )
-        print_structure(maze_graph, size, current_cell_index)
+        # print_structure(maze_graph, size, current_cell_index)
         while True:
             rand_direction = get_random_direction(current_cell, size)
             new_cell = cell_goto_direction(current_cell, rand_direction)
@@ -83,7 +74,7 @@ def generate_maze_graph(size: int):
                     visited_cells_index,
                 )
                 current_cell = new_cell
-                print_structure(maze_graph, size, current_cell_index)
+                # print_structure(maze_graph, size, current_cell_index)
                 continue
             if check_cell_inside_list(visited_cells, new_cell):
                 maze_graph[current_cell_index] = new_cell
@@ -99,7 +90,7 @@ def generate_maze_graph(size: int):
                 current_cell_index,
                 visited_cells_index,
             )
-            print_structure(maze_graph, size, current_cell_index)
+            # print_structure(maze_graph, size, current_cell_index)
             current_cell = new_cell
     return maze_graph
 
@@ -119,7 +110,7 @@ def rand_unvisited_cell(
             available_cells_index += 1
 
 
-def print_structure(graph, size, cell_index):
+def print_structure(graph: npt.NDArray, size: int, cell_index: int):
     graph = np.resize(graph, (cell_index, 2))
     structure = convert_graph_to_structure(graph, size)
     print(structure)

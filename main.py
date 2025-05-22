@@ -6,6 +6,6 @@ if __name__ == "__main__":
     env.reset()
     terminated = False
     truncated = False
-    while not terminated or not truncated:
+    while not terminated and not truncated:
         obs, reward, terminated, truncated, info = env.step(0)
         terminated = True

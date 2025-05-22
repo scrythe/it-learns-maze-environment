@@ -5,10 +5,20 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Pytest",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      // "args": ["${workspaceFolder}/game/maze/test_maze.py", "-s"],
+      "args": ["${workspaceFolder}/it_learns_mazes/test_env.py", "-s"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
       "name": "Python Debugger: Current File",
       "type": "debugpy",
       "request": "launch",
-      "program": "${workspaceFolder}/main.py",
+      "program": "${workspaceFolder}/game/maze/maze.py",
       "console": "integratedTerminal"
     }
   ]

@@ -1,12 +1,10 @@
 from .maze import (
     convert_graph_to_structure,
-    Direction,
     generate_maze_graph,
     reverse_graph_to_cell,
     rand_unvisited_cell,
 )
 import numpy as np
-import pytest
 
 
 def test_random_unvisited_cell():
@@ -17,7 +15,7 @@ def test_random_unvisited_cell():
         rand_cell = rand_unvisited_cell(
             visited_cells, visited_cells_index, total_cells_amount
         )
-        print(rand_cell)
+        # print(rand_cell)
         assert not visited_cells[rand_cell[1], rand_cell[0]].any()
 
 
@@ -92,6 +90,7 @@ def test_convert_maze_structure():
         ]
     )
     maze_structure = convert_graph_to_structure(maze_graph, 2)
+    # print(maze_structure)
     expected_structure = [
         [0, 0, 0, 0, 0],
         [0, 1, 1, 1, 0],
@@ -100,5 +99,3 @@ def test_convert_maze_structure():
         [0, 0, 0, 0, 0],
     ]
     assert (maze_structure == expected_structure).all()
-    print(maze_structure)
-    assert 1 == 1
