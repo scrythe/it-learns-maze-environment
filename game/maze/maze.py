@@ -23,11 +23,11 @@ def convert_graph_to_structure(maze_graph: npt.NDArray, size: int):
     # set_borders(maze_structure)
     prev_cell_pos = maze_graph[0] * 2 + 1
     for cell in maze_graph:
-        cell_pos = cell * 2 + 1
-        maze_structure[cell_pos[1], cell_pos[0]] = 1
         if (cell == -1).all():
             prev_cell_pos = cell
             continue
+        cell_pos = cell * 2 + 1
+        maze_structure[cell_pos[1], cell_pos[0]] = 1
         if (prev_cell_pos == -1).all():
             prev_cell_pos = cell_pos
             continue
@@ -47,16 +47,20 @@ def set_borders(empty_maze_structure):
 
 def generate_maze_graph(size: int):
     total_cells_amount = size * size
-    # Total cellls amount times two because it does not only contain cells but also stop sequence
+    # size more than total cells amount because it does not only contain cells but also stop sequence and such
     # Size in most cases smaller but just incase (worst case scenario total_cells_amount*2-1)
-    maze_graph = np.zeros((total_cells_amount * 2, 2), dtype=np.int32)
+    maze_graph = np.zeros((total_cells_amount * 3, 2), dtype=np.int32)
     visited_cells = np.zeros((size, size), dtype=np.int32)
+    rand_visited_cell = np.random.randint(0, size, 2)
+    visited_cells[rand_visited_cell[1], rand_visited_cell[0]] = 1
     current_cell_index = 0
-    visited_cells_index = 0
+    visited_cells_index = 1
 
-    while current_cell_index < total_cells_amount - 1:
+    while visited_cells_index < total_cells_amount:
         current_sub_graph_cells = np.zeros((size, size), dtype=np.int32)
-        current_cell = np.random.randint(0, size, 2)
+        current_cell = rand_unvisited_cell(
+            visited_cells, visited_cells_index, total_cells_amount
+        )
         current_cell_index, visited_cells_index = add_cell_to_lists(
             maze_graph,
             visited_cells,
@@ -65,21 +69,28 @@ def generate_maze_graph(size: int):
             current_cell_index,
             visited_cells_index,
         )
+        print_structure(maze_graph, size, current_cell_index)
         while True:
-            if visited_cells_index >= total_cells_amount - 1:
-                return maze_graph
-            rand_direction = get_random_directions(current_cell, size)
+            rand_direction = get_random_direction(current_cell, size)
             new_cell = cell_goto_direction(current_cell, rand_direction)
             if check_cell_inside_list(current_sub_graph_cells, new_cell):
                 current_cell_index, visited_cells_index = reverse_graph_to_cell(
                     maze_graph,
                     visited_cells,
                     current_sub_graph_cells,
-                    current_cell,
+                    new_cell,
                     current_cell_index,
                     visited_cells_index,
                 )
+                current_cell = new_cell
+                print_structure(maze_graph, size, current_cell_index)
                 continue
+            if check_cell_inside_list(visited_cells, new_cell):
+                maze_graph[current_cell_index] = new_cell
+                current_cell_index += 1
+                maze_graph[current_cell_index] = -1
+                current_cell_index += 1
+                break
             current_cell_index, visited_cells_index = add_cell_to_lists(
                 maze_graph,
                 visited_cells,
@@ -88,12 +99,30 @@ def generate_maze_graph(size: int):
                 current_cell_index,
                 visited_cells_index,
             )
+            print_structure(maze_graph, size, current_cell_index)
             current_cell = new_cell
-            if check_cell_inside_list(visited_cells, new_cell):
-                maze_graph[current_cell_index] = -1
-                current_cell_index += 1
-                break
     return maze_graph
+
+
+def rand_unvisited_cell(
+    visited_cells: npt.NDArray, visited_cells_index: int, total_cells_amount: int
+):
+    available_cells = total_cells_amount - visited_cells_index - 1
+    available_cells_index = 0
+    rand_cell_index = np.random.randint(0, available_cells + 1)
+    for y_pos, row in enumerate(visited_cells):
+        for x_pos, cell in enumerate(row):
+            if cell == 1:
+                continue
+            if available_cells_index == rand_cell_index:
+                return [x_pos, y_pos]
+            available_cells_index += 1
+
+
+def print_structure(graph, size, cell_index):
+    graph = np.resize(graph, (cell_index, 2))
+    structure = convert_graph_to_structure(graph, size)
+    print(structure)
 
 
 def reverse_graph_to_cell(
@@ -104,13 +133,17 @@ def reverse_graph_to_cell(
     cell_index: int,
     visited_cells_index: int,
 ):
+    cell_index -= 1
+    visited_cells_index -= 1
     current_cell = maze_graph[cell_index]
-    while (target_cell != current_cell).all():
-        visited_cells[current_cell[1]][current_cell[0]] = 0
-        current_sub_graph_cells[current_cell[1]][current_cell[0]] = 1
+    while not (target_cell == current_cell).all():
+        visited_cells[current_cell[1], current_cell[0]] = 0
+        current_sub_graph_cells[current_cell[1], current_cell[0]] = 0
         cell_index -= 1
         visited_cells_index -= 1
         current_cell = maze_graph[cell_index]
+    cell_index += 1
+    visited_cells_index += 1
     return cell_index, visited_cells_index
 
 
@@ -122,15 +155,15 @@ def add_cell_to_lists(
     cell_index: int,
     visited_cells_index: int,
 ):
-    visited_cells[cell[1]][cell[0]] = 1
-    current_sub_graph_cells[cell[1]][cell[0]] = 1
+    visited_cells[cell[1], cell[0]] = 1
+    current_sub_graph_cells[cell[1], cell[0]] = 1
     maze_graph[cell_index] = cell
     cell_index += 1
     visited_cells_index += 1
     return cell_index, visited_cells_index
 
 
-def get_random_directions(current_cell: npt.NDArray, size: int):
+def get_random_direction(current_cell: npt.NDArray, size: int):
     possible_directions: list[Direction] = []
     if current_cell[1] > 0:
         possible_directions.append(Direction.UP)
