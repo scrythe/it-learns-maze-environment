@@ -4,6 +4,7 @@ from .maze import MazeRenderer
 from .player import Player
 from .actions import ActionEnum
 from .maze import WALL
+from .raycaster import Raycaster
 
 
 class Game:
@@ -17,6 +18,11 @@ class Game:
         self.player = Player(
             self.player_radius, self.player_rotation_speed, self.player_movement_speed
         )
+        self.raycaster = Raycaster()
+
+    def draw_ray(self, screen: pygame.Surface):
+        if hasattr(self, "ray"):
+            pygame.draw.line(screen, "Red", self.player.rect.center, self.ray)
 
     def reset(self, size):
         self.maze_structure = generate_maze_structure(size)
@@ -28,6 +34,10 @@ class Game:
         action_enum = ActionEnum(action)
         self.player.step(action_enum)
         collision = self.collision_detection()
+        obs = self.raycaster.cast_single_ray(
+            self.maze_structure, self.player.rect.center, self.player.angle
+        )
+        self.ray = obs
         terminated = collision
         return terminated
 
@@ -63,4 +73,5 @@ class Game:
         # screen.fill("Black")
         self.maze_renderer.draw(screen)
         self.player.draw(screen)
+        self.draw_ray(screen)
         pygame.display.update()
