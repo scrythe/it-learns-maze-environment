@@ -30,8 +30,8 @@ class Player:
             case ActionEnum.FORWARD:
                 direction_x = math.cos(self.angle) * self.SPEED
                 direction_y = math.sin(self.angle) * self.SPEED
-                self.rect.centerx += direction_x
-                self.rect.centery += direction_y
+                self.rect.x += direction_x
+                self.rect.y += direction_y
 
     def draw(self, screen: pygame.Surface):
         end_line_x = self.rect.centerx + math.cos(self.angle) * 20

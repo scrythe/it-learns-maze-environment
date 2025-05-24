@@ -10,7 +10,8 @@
       "request": "launch",
       "module": "pytest",
       // "args": ["${workspaceFolder}/game/maze/test_maze.py", "-s"],
-      "args": ["${workspaceFolder}/it_learns_mazes/test_env.py", "-s"],
+      // "args": ["${workspaceFolder}/it_learns_mazes/test_env.py", "-s"],
+      "args": ["${workspaceFolder}/game/test_game.py", "-s"],
       "console": "integratedTerminal",
       "justMyCode": true
     },
