@@ -35,7 +35,9 @@ class MazeEnv(gym.Env):
         if self.screen is None:
             pygame.init()
             pygame.display.init()
-            self.screen = pygame.display.set_mode((320, 320))
+            self.screen = pygame.display.set_mode(
+                (self.game.rect.width, self.game.rect.height)
+            )
         if self.clock is None:
             self.clock = pygame.Clock()
         pygame.event.pump()
@@ -43,7 +45,7 @@ class MazeEnv(gym.Env):
         self.clock.tick(self.metadata["render_fps"])
 
     def step(self, action):
-        self.game.perform_action(action)
+        self.game.step(action)
         reward = 0
         terminated = True
         truncated = False

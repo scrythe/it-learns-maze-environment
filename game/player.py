@@ -1,0 +1,40 @@
+import pygame
+from .actions import ActionEnum
+import math
+
+
+class Player:
+    RADIUS = 10
+    SPEED = 2
+
+    def __init__(self):
+        self.image = pygame.Surface((self.RADIUS * 2, self.RADIUS * 2))
+        pygame.draw.circle(self.image, "Red", (self.RADIUS, self.RADIUS), self.RADIUS)
+        self.image.set_colorkey("Black")
+        self.rect = self.image.get_frect()
+
+    def reset(self):
+        self.rect.topleft = (40, 40)
+        self.angle = 0
+
+    def step(self, action: ActionEnum):
+        match action:
+            case ActionEnum.ROTATE_LEFT:
+                self.angle -= 0.1
+                if self.angle < 0:
+                    self.angle += 2 * math.pi
+            case ActionEnum.ROTATE_RIGHT:
+                self.angle += 0.1
+                if self.angle > 2 * math.pi:
+                    self.angle -= 2 * math.pi
+            case ActionEnum.FORWARD:
+                direction_x = math.cos(self.angle) * self.SPEED
+                direction_y = math.sin(self.angle) * self.SPEED
+                self.rect.centerx += direction_x
+                self.rect.centery += direction_y
+
+    def draw(self, screen: pygame.Surface):
+        end_line_x = self.rect.centerx + math.cos(self.angle) * 20
+        end_line_y = self.rect.centery + math.sin(self.angle) * 20
+        pygame.draw.line(screen, "Blue", self.rect.center, (end_line_x, end_line_y), 5)
+        screen.blit(self.image, self.rect)

@@ -5,8 +5,6 @@ import gymnasium as gym
 
 def test_custom_env():
     env = gym.make("it-learns-mazes-v0")
-    env.reset(seed=5, options={"size": 3})
-    env.reset(seed=5, options={"size": 3})
     check_env(env.unwrapped)
 
 
