@@ -4,12 +4,11 @@ import math
 
 
 class Player:
-    RADIUS = 10
-    SPEED = 2
-
-    def __init__(self):
-        self.image = pygame.Surface((self.RADIUS * 2, self.RADIUS * 2))
-        pygame.draw.circle(self.image, "Red", (self.RADIUS, self.RADIUS), self.RADIUS)
+    def __init__(self, radius, speed):
+        self.radius = radius
+        self.speed = speed
+        self.image = pygame.Surface((self.radius * 2, self.radius * 2))
+        pygame.draw.circle(self.image, "Red", (self.radius, self.radius), self.radius)
         self.image.set_colorkey("Black")
         self.rect = self.image.get_frect()
 
@@ -28,8 +27,8 @@ class Player:
                 if self.angle > 2 * math.pi:
                     self.angle -= 2 * math.pi
             case ActionEnum.FORWARD:
-                direction_x = math.cos(self.angle) * self.SPEED
-                direction_y = math.sin(self.angle) * self.SPEED
+                direction_x = math.cos(self.angle) * self.speed
+                direction_y = math.sin(self.angle) * self.speed
                 self.rect.x += direction_x
                 self.rect.y += direction_y
 

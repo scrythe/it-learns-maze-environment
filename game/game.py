@@ -3,14 +3,17 @@ from .maze import generate_maze_structure
 from .maze import MazeRenderer
 from .player import Player
 from .actions import ActionEnum
-
-WALL = 0
+from .maze import WALL
 
 
 class Game:
+    cell_width = 40
+    player_radius = 10
+    player_speed = 2
+
     def __init__(self):
-        self.maze_renderer = MazeRenderer()
-        self.player = Player()
+        self.maze_renderer = MazeRenderer(self.cell_width)
+        self.player = Player(self.player_radius, self.player_speed)
 
     def reset(self, size):
         self.maze_structure = generate_maze_structure(size)
@@ -23,24 +26,27 @@ class Game:
         self.collision()
 
     def collision(self):
-        x_pos = int(self.player.rect.centerx / 40)
-        y_pos = int(self.player.rect.centery / 40)
+        x_pos = int(self.player.rect.centerx / self.cell_width)
+        y_pos = int(self.player.rect.centery / self.cell_width)
+
         # Check colliding with right cell
+        # Should maybe check if index out of range, but unlikely to happen
+        # because of borders
         if self.maze_structure[y_pos, x_pos + 1] == WALL:
-            if int(self.player.rect.right / 40) == x_pos + 1:
-                self.player.rect.right = (x_pos + 1) * 40
+            if int(self.player.rect.right / self.cell_width) == x_pos + 1:
+                self.player.rect.right = (x_pos + 1) * self.cell_width
         # Check colliding with left cell
         if self.maze_structure[y_pos, x_pos - 1] == WALL:
-            if int(self.player.rect.left / 40) == x_pos - 1:
-                self.player.rect.left = x_pos * 40
+            if int(self.player.rect.left / self.cell_width) == x_pos - 1:
+                self.player.rect.left = x_pos * self.cell_width
         # Check colliding with above cell
         if self.maze_structure[y_pos - 1, x_pos] == WALL:
-            if int(self.player.rect.top / 40) == y_pos - 1:
-                self.player.rect.top = y_pos * 40
+            if int(self.player.rect.top / self.cell_width) == y_pos - 1:
+                self.player.rect.top = y_pos * self.cell_width
         # Check colliding with below cell
         if self.maze_structure[y_pos + 1, x_pos] == WALL:
-            if int(self.player.rect.bottom / 40) == y_pos + 1:
-                self.player.rect.bottom = (y_pos + 1) * 40
+            if int(self.player.rect.bottom / self.cell_width) == y_pos + 1:
+                self.player.rect.bottom = (y_pos + 1) * self.cell_width
 
     def draw(self, screen: pygame.Surface):
         # screen.fill("Black")

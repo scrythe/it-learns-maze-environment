@@ -1,10 +1,9 @@
 from .game import Game
 import pygame
-import pytest
 from .actions import ActionEnum
 
 
-@pytest.mark.skip(reason="don't want to test everytime")
+# @pytest.mark.skip(reason="don't want to test everytime")
 def test_game():
     game = Game()
     size = 10

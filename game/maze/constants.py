@@ -1,0 +1,3 @@
+WALL = 0
+PATH = 1
+GOAL = 2

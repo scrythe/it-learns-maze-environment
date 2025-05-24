@@ -1,16 +1,12 @@
 import numpy.typing as npt
 import pygame
-
-WALL = 0
-PATH = 1
-GOAL = 2
+from .constants import PATH
 
 
 class MazeRenderer:
-    CELL_WIDTH = 40
-
-    def __init__(self):
-        self.path = pygame.Surface((self.CELL_WIDTH, self.CELL_WIDTH))
+    def __init__(self, cell_width):
+        self.cell_width = cell_width
+        self.path = pygame.Surface((self.cell_width, self.cell_width))
         self.path.fill("White")
         self.wall = self.path.copy()
         self.wall.fill("Black")
@@ -19,7 +15,7 @@ class MazeRenderer:
         self.current_rect = self.path.get_rect()
 
     def reset(self, maze_structure: npt.NDArray):
-        image_width = self.CELL_WIDTH * len(maze_structure)
+        image_width = self.cell_width * len(maze_structure)
         self.image = pygame.Surface((image_width, image_width))
         self.create_maze_image(maze_structure)
 
@@ -32,8 +28,8 @@ class MazeRenderer:
                     self.image.blit(self.path, self.current_rect)
                 else:
                     self.image.blit(self.wall, self.current_rect)
-                self.current_rect.x += self.CELL_WIDTH
-            self.current_rect.y += self.CELL_WIDTH
+                self.current_rect.x += self.cell_width
+            self.current_rect.y += self.cell_width
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.image)
