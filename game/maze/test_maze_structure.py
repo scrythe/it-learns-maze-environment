@@ -1,4 +1,4 @@
-from .maze import (
+from .maze_structure import (
     convert_graph_to_structure,
     generate_maze_graph,
     reverse_graph_to_cell,
