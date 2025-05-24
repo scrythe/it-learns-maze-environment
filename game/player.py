@@ -4,9 +4,10 @@ import math
 
 
 class Player:
-    def __init__(self, radius, speed):
+    def __init__(self, radius, rotation_speed, movement_speed):
         self.radius = radius
-        self.speed = speed
+        self.rotation_speed = rotation_speed
+        self.movement_speed = movement_speed
         self.image = pygame.Surface((self.radius * 2, self.radius * 2))
         pygame.draw.circle(self.image, "Red", (self.radius, self.radius), self.radius)
         self.image.set_colorkey("Black")
@@ -19,16 +20,16 @@ class Player:
     def step(self, action: ActionEnum):
         match action:
             case ActionEnum.ROTATE_LEFT:
-                self.angle -= 0.1
+                self.angle -= self.rotation_speed
                 if self.angle < 0:
                     self.angle += 2 * math.pi
             case ActionEnum.ROTATE_RIGHT:
-                self.angle += 0.1
+                self.angle += self.rotation_speed
                 if self.angle > 2 * math.pi:
                     self.angle -= 2 * math.pi
             case ActionEnum.FORWARD:
-                direction_x = math.cos(self.angle) * self.speed
-                direction_y = math.sin(self.angle) * self.speed
+                direction_x = math.cos(self.angle) * self.movement_speed
+                direction_y = math.sin(self.angle) * self.movement_speed
                 self.rect.x += direction_x
                 self.rect.y += direction_y
 

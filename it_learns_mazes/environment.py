@@ -6,7 +6,7 @@ from game import Game
 
 
 class MazeEnv(gym.Env):
-    metadata = {"render_modes": ["human"], "render_fps": 1}
+    metadata = {"render_modes": ["human"], "render_fps": 60}
 
     def __init__(self, render_mode=None):
         assert render_mode is None or render_mode in self.metadata["render_modes"]
@@ -45,9 +45,8 @@ class MazeEnv(gym.Env):
         self.clock.tick(self.metadata["render_fps"])
 
     def step(self, action):
-        self.game.step(action)
+        terminated = self.game.step(action)
         reward = 0
-        terminated = True
         truncated = False
         info = {}
 
