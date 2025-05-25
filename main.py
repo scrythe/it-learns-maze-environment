@@ -12,7 +12,7 @@ if __name__ == "__main__":
             pygame.init()
             pygame.display.init()
             keys = pygame.key.get_pressed()
-            action = 2
+            action = 3
             if keys[pygame.K_a]:
                 action = 0
             elif keys[pygame.K_d]:

@@ -6,23 +6,34 @@ from .maze import WALL
 
 # thanks to javidx9 video
 class Raycaster:
-    def __init__(self, cell_width: int):
+    def __init__(self, cell_width: int, rays_amount: int, fov: int):
         self.cell_width = cell_width
+        self.rays_amount = rays_amount
+        self.fov = fov
+        self.angle_step = self.fov / (self.rays_amount - 1)
 
     def reset(self, maze_structure: npt.NDArray):
         self.maze_structure = maze_structure
 
-    def cast_multiple_rays(self):
-        pass
+    def cast_multiple_rays(self, player_pos: tuple[float, float], player_angle: float):
+        rays = []
+        ray_angle = player_angle - self.fov / 2
+        for _ in range(self.rays_amount):
+            ray = self.cast_single_ray(player_pos, player_angle, ray_angle)
+            rays.append(ray)
+            ray_angle += self.angle_step
+        return rays
 
-    def cast_single_ray(self, player_pos: tuple[float, float], angle: float):
-        if angle == 0:
-            angle = 0.000001
+    def cast_single_ray(
+        self, player_pos: tuple[float, float], player_angle: float, ray_angle: float
+    ):
+        if ray_angle == 0:
+            ray_angle = 0.000001
         player_pos_normalised = np.array(player_pos) / 40
         ray_start_pos = player_pos_normalised
         ray_maze_pos = np.array([int(ray_start_pos[0]), int(ray_start_pos[1])])
-        ray_dir_x = math.cos(angle)
-        ray_dir_y = math.sin(angle)
+        ray_dir_x = math.cos(ray_angle)
+        ray_dir_y = math.sin(ray_angle)
         ray_length_step_x = math.sqrt(1 + math.pow((ray_dir_y / ray_dir_x), 2))
         ray_length_step_y = math.sqrt(1 + math.pow((ray_dir_x / ray_dir_y), 2))
         # looking left
@@ -54,8 +65,11 @@ class Raycaster:
                 ray_length_x += ray_length_step_x
             if self.maze_structure[ray_maze_pos[1], ray_maze_pos[0]] == WALL:
                 collision = True
-        ray_end = player_pos + ray_length * np.array([ray_dir_x, ray_dir_y]) * 40
-        return ray_end
+        ray_length *= self.cell_width
+        ray_end = player_pos + ray_length * np.array([ray_dir_x, ray_dir_y])
+        no_fish_angle = player_angle - ray_angle
+        no_fish_length = math.cos(no_fish_angle) * ray_length
+        return ray_end, no_fish_length
 
     # def cast_straight_ray(
     #     self,
