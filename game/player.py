@@ -14,7 +14,7 @@ class Player:
         self.rect = self.image.get_frect()
 
     def reset(self):
-        self.rect.topleft = (40, 40)
+        self.rect.topleft = (120, 120)
         self.angle = 0
 
     def step(self, action: ActionEnum):

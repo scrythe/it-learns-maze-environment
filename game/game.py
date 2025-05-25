@@ -18,7 +18,7 @@ class Game:
         self.player = Player(
             self.player_radius, self.player_rotation_speed, self.player_movement_speed
         )
-        self.raycaster = Raycaster()
+        self.raycaster = Raycaster(self.cell_width)
 
     def draw_ray(self, screen: pygame.Surface):
         if hasattr(self, "ray"):
@@ -27,6 +27,7 @@ class Game:
     def reset(self, size):
         self.maze_structure = generate_maze_structure(size)
         self.maze_renderer.reset(self.maze_structure)
+        self.raycaster.reset(self.maze_structure)
         self.rect = self.maze_renderer.image.get_rect()
         self.player.reset()
 
@@ -34,9 +35,7 @@ class Game:
         action_enum = ActionEnum(action)
         self.player.step(action_enum)
         collision = self.collision_detection()
-        obs = self.raycaster.cast_single_ray(
-            self.maze_structure, self.player.rect.center, self.player.angle
-        )
+        obs = self.raycaster.cast_single_ray(self.player.rect.center, self.player.angle)
         self.ray = obs
         terminated = collision
         return terminated
