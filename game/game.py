@@ -13,9 +13,8 @@ class Game:
     player_radius = 10
     player_rotation_speed = 0.05
     player_movement_speed = 2
-    rays_amount = 25
+    rays_amount = 45
     fov = 1 / 2 * math.pi  # 90 degrees
-    rect_height_factor = 20
 
     def __init__(self):
         self.maze_renderer = MazeRenderer(self.cell_width)
@@ -54,7 +53,7 @@ class Game:
         self.rect = self.maze_renderer.image.get_rect()
         self.rect.width *= 2
         self.ray_width_step = (self.rect.width / 2) / self.rays_amount
-        self.object_height_factor = self.rect.height * self.rect_height_factor
+        self.object_height_factor = self.rect.height * self.player_radius
         self.player.reset()
 
     def step(self, action: int):
@@ -99,6 +98,6 @@ class Game:
         screen.fill("Black")
         self.maze_renderer.draw(screen)
         self.player.draw(screen)
-        self.draw_ray(screen)
+        # self.draw_ray(screen)
         self.draw_3d(screen)
         pygame.display.update()
