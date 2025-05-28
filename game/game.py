@@ -6,6 +6,8 @@ from .actions import ActionEnum
 from .maze import WALL
 from .raycaster import Raycaster
 import math
+from line_profiler import profile
+import rust_raycaster
 
 
 class Game:
@@ -21,21 +23,21 @@ class Game:
         self.player = Player(
             self.player_radius, self.player_rotation_speed, self.player_movement_speed
         )
-        self.raycaster = Raycaster(self.cell_width, self.rays_amount, self.fov)
+        # self.raycaster = Raycaster(self.cell_width, self.rays_amount, self.fov)
+        self.raycaster = rust_raycaster.RayCaster(
+            self.cell_width, self.rays_amount, self.fov
+        )
 
     def draw_ray(self, screen: pygame.Surface):
         if hasattr(self, "rays"):
-            for ray in self.rays:
-                pygame.draw.line(screen, "Red", self.player.rect.center, ray[0])
+            for ray in self.rays[1]:
+                pygame.draw.line(screen, "Red", self.player.rect.center, ray)
 
     def draw_3d(self, screen: pygame.Surface):
         if hasattr(self, "rays"):
             x = self.rect.width / 2 + self.ray_width_step / 2
-            for ray in self.rays:
-                ray_length = ray[1]
-                object_length = min(
-                    self.object_height_factor / ray_length, self.rect.height
-                )
+            for ray in self.rays[0]:
+                object_length = min(self.object_height_factor / ray, self.rect.height)
                 y = self.rect.height / 2 - object_length / 2
                 pygame.draw.line(
                     screen,
@@ -56,6 +58,7 @@ class Game:
         self.object_height_factor = self.rect.height * self.player_radius
         self.player.reset()
 
+    @profile
     def step(self, action: int):
         action_enum = ActionEnum(action)
         self.player.step(action_enum)
@@ -98,6 +101,6 @@ class Game:
         screen.fill("Black")
         self.maze_renderer.draw(screen)
         self.player.draw(screen)
-        # self.draw_ray(screen)
+        self.draw_ray(screen)
         self.draw_3d(screen)
         pygame.display.update()

@@ -5,6 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Python with PyO3",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/.venv/Scripts/python",
+      "args": ["${file}"],
+      "cwd": "${workspaceFolder}",
+      "sourceLanguages": ["rust"]
+    },
+    {
       "name": "Pytest",
       "type": "debugpy",
       "request": "launch",
@@ -12,6 +21,7 @@
       // "args": ["${workspaceFolder}/game/maze/test_maze.py", "-s"],
       // "args": ["${workspaceFolder}/it_learns_mazes/test_env.py", "-s"],
       "args": ["${workspaceFolder}/game/test_game.py", "-s"],
+      // "args": ["${workspaceFolder}/game/test_raycaster.py", "-s"],
       "console": "integratedTerminal",
       "justMyCode": true
     },

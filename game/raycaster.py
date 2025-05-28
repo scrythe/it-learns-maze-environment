@@ -2,6 +2,7 @@ import math
 import numpy as np
 import numpy.typing as npt
 from .maze import WALL
+from line_profiler import profile
 
 
 # thanks to javidx9 video
@@ -21,8 +22,10 @@ class Raycaster:
     def reset(self, maze_structure: npt.NDArray):
         self.maze_structure = maze_structure
 
+    # @profile
     def cast_multiple_rays(self, player_pos: tuple[float, float], player_angle: float):
-        rays = []
+        rays_length = []
+        rays_pos = []
         ray_angle = player_angle - self.ray_angle_substraction
         player_pos_normalised = np.array(player_pos) / 40
         player_maze_pos = np.array(
@@ -30,16 +33,18 @@ class Raycaster:
         )
         for _ in range(self.rays_amount):
             ray = self.cast_single_ray(
-                player_maze_pos,
+                np.array(player_pos),
                 player_pos_normalised,
                 player_maze_pos,
                 player_angle,
                 ray_angle,
             )
-            rays.append(ray)
+            rays_length.append(ray[0])
+            rays_pos.append(ray[1])
             ray_angle += self.angle_step
-        return rays
+        return rays_length, rays_pos
 
+    # @profile
     def cast_single_ray(
         self,
         player_pos: npt.NDArray,
@@ -99,4 +104,4 @@ class Raycaster:
         ray_end = player_pos + ray_length * np.array([ray_dir_x, ray_dir_y])
         no_fish_angle = player_angle - ray_angle
         no_fish_length = math.cos(no_fish_angle) * ray_length
-        return ray_end, no_fish_length
+        return no_fish_length, ray_end

@@ -1,22 +1,27 @@
 import it_learns_mazes
 import gymnasium as gym
 import pygame
+from pyinstrument import Profiler
+
 
 if __name__ == "__main__":
-    env = gym.make("it-learns-mazes-v0", render_mode="human")
-    for _ in range(5):
-        env.reset()
+    # env = gym.make("it-learns-mazes-v0", render_mode="human")
+    env = gym.make("it-learns-mazes-v0")
+    for i in range(500):
+        env.reset(seed=i)
         terminated = False
         truncated = False
         while not terminated and not truncated:
             pygame.init()
             pygame.display.init()
             keys = pygame.key.get_pressed()
-            action = 3
-            if keys[pygame.K_a]:
-                action = 0
-            elif keys[pygame.K_d]:
-                action = 1
-            elif keys[pygame.K_w]:
-                action = 2
+            action = 2
+            # if keys[pygame.K_a]:
+            #     action = 0
+            # elif keys[pygame.K_d]:
+            #     action = 1
+            # elif keys[pygame.K_w]:
+            #     action = 2
+            # profiler.enable()
             obs, reward, terminated, truncated, info = env.step(action)
+            # profiler.disable()
