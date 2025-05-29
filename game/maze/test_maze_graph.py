@@ -8,7 +8,10 @@ def test_random_unvisited_cell():
     total_cells_amount = 9
     for _ in range(20):
         rand_cell = rand_unvisited_cell(
-            visited_cells, visited_cells_index, total_cells_amount
+            visited_cells,
+            visited_cells_index,
+            total_cells_amount,
+            np.random.default_rng(),
         )
         # print(rand_cell)
         assert not visited_cells[rand_cell[1], rand_cell[0]].any()

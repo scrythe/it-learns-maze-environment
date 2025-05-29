@@ -2,12 +2,13 @@ import pygame
 from .maze import generate_maze_structure
 from .maze import MazeRenderer
 from .player import Player
-from .actions import ActionEnum
 from .maze import WALL
-from .raycaster import Raycaster
 import math
 from line_profiler import profile
-import rust_raycaster
+from rust_raycaster import Raycaster
+import numpy as np
+
+# from .outdated_raycaster import Raycaster
 
 
 class Game:
@@ -15,7 +16,7 @@ class Game:
     player_radius = 10
     player_rotation_speed = 0.05
     player_movement_speed = 2
-    rays_amount = 45
+    rays_amount = 6
     fov = 1 / 2 * math.pi  # 90 degrees
 
     def __init__(self):
@@ -24,19 +25,12 @@ class Game:
             self.player_radius, self.player_rotation_speed, self.player_movement_speed
         )
         # self.raycaster = Raycaster(self.cell_width, self.rays_amount, self.fov)
-        self.raycaster = rust_raycaster.RayCaster(
-            self.cell_width, self.rays_amount, self.fov
-        )
-
-    def draw_ray(self, screen: pygame.Surface):
-        if hasattr(self, "rays"):
-            for ray in self.rays[1]:
-                pygame.draw.line(screen, "Red", self.player.rect.center, ray)
+        self.raycaster = Raycaster(self.cell_width, self.rays_amount, self.fov)
 
     def draw_3d(self, screen: pygame.Surface):
         if hasattr(self, "rays"):
             x = self.rect.width / 2 + self.ray_width_step / 2
-            for ray in self.rays[0]:
+            for ray in self.rays:
                 object_length = min(self.object_height_factor / ray, self.rect.height)
                 y = self.rect.height / 2 - object_length / 2
                 pygame.draw.line(
@@ -48,8 +42,8 @@ class Game:
                 )
                 x += self.ray_width_step
 
-    def reset(self, size):
-        self.maze_structure = generate_maze_structure(size)
+    def reset(self, size: int, np_random: np.random.Generator):
+        self.maze_structure = generate_maze_structure(size, np_random)
         self.maze_renderer.reset(self.maze_structure)
         self.raycaster.reset(self.maze_structure)
         self.rect = self.maze_renderer.image.get_rect()
@@ -58,16 +52,19 @@ class Game:
         self.object_height_factor = self.rect.height * self.player_radius
         self.player.reset()
 
-    @profile
-    def step(self, action: int):
-        action_enum = ActionEnum(action)
-        self.player.step(action_enum)
-        collision = self.collision_detection()
+    def _get_obs(self):
         self.rays = self.raycaster.cast_multiple_rays(
             self.player.rect.center, self.player.angle
         )
+        return np.array(self.rays, dtype=np.float32)
+
+    @profile
+    def step(self, action: int):
+        self.player.step(action)
+        collision = self.collision_detection()
+        obs = self._get_obs()
         terminated = collision
-        return terminated
+        return obs, terminated
 
     def collision_detection(self):
         x_pos = int(self.player.rect.centerx / self.cell_width)
@@ -101,6 +98,5 @@ class Game:
         screen.fill("Black")
         self.maze_renderer.draw(screen)
         self.player.draw(screen)
-        self.draw_ray(screen)
         self.draw_3d(screen)
         pygame.display.update()

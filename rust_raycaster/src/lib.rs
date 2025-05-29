@@ -6,7 +6,7 @@ type Position<T> = [T; 2];
 const WALL: i32 = 0;
 
 #[pyclass]
-struct RayCaster {
+struct Raycaster {
     cell_width: i32,
     rays_amount: usize,
     angle_step: f32,
@@ -15,12 +15,12 @@ struct RayCaster {
 }
 
 #[pymethods]
-impl RayCaster {
+impl Raycaster {
     #[new]
     fn new(cell_width: i32, rays_amount: usize, fov: f32) -> Self {
         let angle_step = fov / (rays_amount - 1) as f32;
         let ray_angle_substraction = fov / 2 as f32;
-        RayCaster {
+        Raycaster {
             cell_width,
             rays_amount,
             angle_step,
@@ -31,43 +31,34 @@ impl RayCaster {
     fn reset(&mut self, maze_structure: Vec<Vec<i32>>) {
         self.maze_structure = maze_structure;
     }
-    fn cast_multiple_rays(
-        &self,
-        player_position: Position<f32>,
-        player_angle: f32,
-    ) -> (Vec<f32>, Vec<[f32; 2]>) {
-        let mut rays_length = vec![0.0; self.rays_amount];
-        let mut rays_pos = vec![[0.0; 2]; self.rays_amount];
+    fn cast_multiple_rays(&self, player_position: Position<f32>, player_angle: f32) -> Vec<f32> {
+        let mut rays = vec![0.0; self.rays_amount];
         let mut ray_angle = player_angle - self.ray_angle_substraction;
         let mut player_pos_normalised = player_position;
         player_pos_normalised[0] /= self.cell_width as f32;
         player_pos_normalised[1] /= self.cell_width as f32;
         let player_maze_pos = player_pos_normalised.map(|x| x as i32);
 
-        for ray_i in 0..self.rays_amount {
-            let rays = self.cast_single_ray(
-                player_position,
+        for ray in &mut rays {
+            *ray = self.cast_single_ray(
                 player_pos_normalised,
                 player_maze_pos,
                 player_angle,
                 ray_angle,
             );
-            rays_length[ray_i] = rays.0;
-            rays_pos[ray_i] = rays.1;
             ray_angle += self.angle_step
         }
 
-        (rays_length, rays_pos)
+        rays
     }
 
     fn cast_single_ray(
         &self,
-        player_position: Position<f32>,
         player_pos_normalised: Position<f32>,
         mut ray_maze_pos: Position<i32>,
         player_angle: f32,
         mut ray_angle: f32,
-    ) -> (f32, [f32; 2]) {
+    ) -> f32 {
         if ray_angle == 0.0 {
             ray_angle = 0.000001
         }
@@ -131,16 +122,13 @@ impl RayCaster {
         ray_length *= self.cell_width as f32;
         let no_fish_angle = f32::abs(player_angle - ray_angle);
         let no_fish_length = no_fish_angle.cos() * ray_length;
-        let ray_end_x = player_position[0] + ray_length * ray_dir_x;
-        let ray_end_y = player_position[1] + ray_length * ray_dir_y;
-        let ray_end = [ray_end_x, ray_end_y];
-        (no_fish_length, ray_end)
+        no_fish_length
     }
 }
 
 /// A Python module implemented in Rust.
 #[pymodule]
 fn rust_raycaster(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<RayCaster>()?;
+    m.add_class::<Raycaster>()?;
     Ok(())
 }

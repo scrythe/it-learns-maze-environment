@@ -1,13 +1,15 @@
 from .game import Game
 import pygame
 from .actions import ActionEnum
+import numpy as np
+import pytest
 
 
-# @pytest.mark.skip(reason="don't want to test everytime")
+@pytest.mark.skip(reason="don't want to test everytime")
 def test_game():
     game = Game()
     size = 10
-    game.reset(size)
+    game.reset(size, np.random.default_rng())
 
     pygame.init()
     pygame.display.init()
@@ -21,11 +23,11 @@ def test_game():
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
-            game.step(ActionEnum.ROTATE_LEFT)
+            game.step(0)
         elif keys[pygame.K_d]:
-            game.step(ActionEnum.ROTATE_RIGHT)
+            game.step(1)
         elif keys[pygame.K_w]:
-            game.step(ActionEnum.FORWARD)
+            game.step(2)
 
         game.draw(screen)
         pygame.display.update()

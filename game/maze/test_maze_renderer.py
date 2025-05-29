@@ -2,13 +2,14 @@ from .maze_structure import generate_maze_structure
 from .maze_renderer import MazeRenderer
 import pygame
 import pytest
+import numpy as np
 
 
 @pytest.mark.skip(reason="don't want to test everytime")
 def test_maze():
     size = 12
-    maze_structure = generate_maze_structure(size)
-    maze_renderer = MazeRenderer()
+    maze_structure = generate_maze_structure(size, np.random.default_rng())
+    maze_renderer = MazeRenderer(40)
     maze_renderer.reset(maze_structure)
 
     pygame.init()

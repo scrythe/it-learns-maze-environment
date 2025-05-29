@@ -14,22 +14,18 @@ class MazeEnv(gym.Env):
         self.game = Game()
         self.screen = None
         self.clock = None
-        self.observation_space = spaces.Box(low=0, high=1, shape=(6,), dtype=np.float32)
+        self.observation_space = spaces.Box(
+            low=0, high=self.game.cell_width * 20, shape=(6,), dtype=np.float32
+        )
         self.action_space = spaces.Discrete(2)
-
-    def _get_obs(self):
-        return [0, 0, 0, 0, 0, 0]
 
     def reset(self, seed=None, options={"size": 5}):
         super().reset(seed=seed)
-        np.random.seed(seed)
         if not options:
             options = {"size": 5}
-        self.game.reset(options["size"])
+        self.game.reset(options["size"], self.np_random)
         info = {}
-        # initialise and reset
-        obs = self._get_obs(), info
-        return obs
+        return self.game._get_obs(), info
 
     def render(self):
         if self.screen is None:
@@ -45,7 +41,7 @@ class MazeEnv(gym.Env):
         self.clock.tick(self.metadata["render_fps"])
 
     def step(self, action):
-        terminated = self.game.step(action)
+        obs, terminated = self.game.step(action)
         reward = 0
         truncated = False
         info = {}
@@ -53,5 +49,4 @@ class MazeEnv(gym.Env):
         if self.render_mode == "human":
             self.render()
 
-        obs = self._get_obs(), reward, terminated, truncated, info
-        return obs
+        return obs, reward, terminated, truncated, info

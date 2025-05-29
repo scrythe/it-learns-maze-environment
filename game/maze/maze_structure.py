@@ -4,8 +4,8 @@ from .constants import PATH
 from .maze_graph import generate_maze_graph
 
 
-def generate_maze_structure(size: int):
-    maze_graph = generate_maze_graph(size)
+def generate_maze_structure(size: int, np_random: np.random.Generator):
+    maze_graph = generate_maze_graph(size, np_random)
     maze_structure = convert_graph_to_structure(maze_graph, size)
     return maze_structure
 

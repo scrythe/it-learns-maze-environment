@@ -8,7 +8,7 @@ import numpy as np
 def test_generate_maze_structure():
     for _ in range(20):
         size = 4
-        maze_graph = generate_maze_graph(size)
+        maze_graph = generate_maze_graph(size, np.random.default_rng())
         maze_structure = convert_graph_to_structure(maze_graph, size)
         for y in range(size):
             for x in range(size):

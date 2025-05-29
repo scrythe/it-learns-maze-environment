@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import IntEnum
 
 
-class ActionEnum(Enum):
+class ActionEnum(IntEnum):
     ROTATE_LEFT = 0
     ROTATE_RIGHT = 1
     FORWARD = 2

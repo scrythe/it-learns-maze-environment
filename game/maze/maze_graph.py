@@ -10,13 +10,13 @@ class Direction(Enum):
     LEFT = 3
 
 
-def generate_maze_graph(size: int):
+def generate_maze_graph(size: int, np_random: np.random.Generator):
     total_cells_amount = size * size
     # size more than total cells amount because it does not only contain cells but also stop sequence and such
     # Size in most cases smaller but just incase (worst case scenario total_cells_amount*2-1)
     maze_graph = np.zeros((total_cells_amount * 3, 2), dtype=np.int32)
     visited_cells = np.zeros((size, size), dtype=np.int32)
-    rand_visited_cell = np.random.randint(0, size, 2)
+    rand_visited_cell = np_random.integers(0, size, 2)
     visited_cells[rand_visited_cell[1], rand_visited_cell[0]] = 1
     current_cell_index = 0
     visited_cells_index = 1
@@ -24,7 +24,7 @@ def generate_maze_graph(size: int):
     while visited_cells_index < total_cells_amount:
         current_sub_graph_cells = np.zeros((size, size), dtype=np.int32)
         current_cell = rand_unvisited_cell(
-            visited_cells, visited_cells_index, total_cells_amount
+            visited_cells, visited_cells_index, total_cells_amount, np_random
         )
         current_cell_index, visited_cells_index = add_cell_to_lists(
             maze_graph,
@@ -35,7 +35,7 @@ def generate_maze_graph(size: int):
             visited_cells_index,
         )
         while True:
-            rand_direction = get_random_direction(current_cell, size)
+            rand_direction = get_random_direction(current_cell, size, np_random)
             new_cell = cell_goto_direction(current_cell, rand_direction)
             if check_cell_inside_list(current_sub_graph_cells, new_cell):
                 current_cell_index, visited_cells_index = reverse_graph_to_cell(
@@ -67,11 +67,14 @@ def generate_maze_graph(size: int):
 
 
 def rand_unvisited_cell(
-    visited_cells: npt.NDArray, visited_cells_index: int, total_cells_amount: int
+    visited_cells: npt.NDArray,
+    visited_cells_index: int,
+    total_cells_amount: int,
+    np_random: np.random.Generator,
 ):
     available_cells = total_cells_amount - visited_cells_index - 1
     available_cells_index = 0
-    rand_cell_index = np.random.randint(0, available_cells + 1)
+    rand_cell_index = np_random.integers(0, available_cells + 1)
     for y_pos, row in enumerate(visited_cells):
         for x_pos, cell in enumerate(row):
             if cell == 1:
@@ -119,7 +122,9 @@ def add_cell_to_lists(
     return cell_index, visited_cells_index
 
 
-def get_random_direction(current_cell: npt.NDArray, size: int):
+def get_random_direction(
+    current_cell: npt.NDArray, size: int, np_random: np.random.Generator
+):
     possible_directions: list[Direction] = []
     if current_cell[1] > 0:
         possible_directions.append(Direction.UP)
@@ -130,7 +135,7 @@ def get_random_direction(current_cell: npt.NDArray, size: int):
     if current_cell[0] > 0:
         possible_directions.append(Direction.LEFT)
 
-    rand_direction_index = np.random.randint(0, len(possible_directions))
+    rand_direction_index = np_random.integers(0, len(possible_directions))
     rand_direction = possible_directions[rand_direction_index]
     return rand_direction
 

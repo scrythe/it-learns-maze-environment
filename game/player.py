@@ -17,7 +17,7 @@ class Player:
         self.rect.topleft = (120, 120)
         self.angle = 0
 
-    def step(self, action: ActionEnum):
+    def step(self, action: int):
         match action:
             case ActionEnum.ROTATE_LEFT:
                 self.angle -= self.rotation_speed
