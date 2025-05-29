@@ -42,9 +42,9 @@ class Game:
             )
             x += self.ray_width_step
 
-    @profile
-    def reset(self, size: int, np_random: np.random.Generator):
-        self.maze_structure = generate_maze_structure(size, np_random)
+    # @profile
+    def reset(self, size: int, seed: int):
+        self.maze_structure = generate_maze_structure(size, seed)
         self.raycaster.reset(self.maze_structure)
         maze_width = self.cell_width * len(self.maze_structure)
         self.ray_width_step = (maze_width) / self.rays_amount

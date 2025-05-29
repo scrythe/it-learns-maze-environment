@@ -23,7 +23,7 @@ class MazeEnv(gym.Env):
         super().reset(seed=seed)
         if not options:
             options = {"size": 5}
-        self.game.reset(options["size"], self.np_random)
+        self.game.reset(options["size"], self.np_random_seed)
         info = {}
         return self.game._get_obs(), info
 

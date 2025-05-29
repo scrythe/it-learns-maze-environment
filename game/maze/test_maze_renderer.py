@@ -5,10 +5,10 @@ import pytest
 import numpy as np
 
 
-@pytest.mark.skip(reason="don't want to test everytime")
+# @pytest.mark.skip(reason="don't want to test everytime")
 def test_maze():
     size = 12
-    maze_structure = generate_maze_structure(size, np.random.default_rng())
+    maze_structure = generate_maze_structure(size, np.random.SeedSequence().entropy)
     maze_renderer = MazeRenderer(40)
     maze_renderer.reset(maze_structure)
 

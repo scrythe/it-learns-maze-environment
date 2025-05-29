@@ -1,12 +1,17 @@
 import numpy as np
 import numpy.typing as npt
 from .constants import PATH
-from .maze_graph import generate_maze_graph
+
+# from .maze_graph import generate_maze_graph
+from line_profiler import profile
+
+from maze_env_rust import generate_maze_graph
 
 
-def generate_maze_structure(size: int, np_random: np.random.Generator):
-    maze_graph = generate_maze_graph(size, np_random)
-    maze_structure = convert_graph_to_structure(maze_graph, size)
+@profile
+def generate_maze_structure(size: int, seed: int):
+    maze_graph = generate_maze_graph(size, seed)
+    maze_structure = convert_graph_to_structure(np.array(maze_graph), size)
     return maze_structure
 
 

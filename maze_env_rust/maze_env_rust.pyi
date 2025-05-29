@@ -4,3 +4,5 @@ class Raycaster:
         self, player_position: tuple[float, float], player_angle: float
     ):
         tuple[list[float], list[list[float]]]
+
+def generate_maze_graph(size: int, seed: int) -> list[list[int]]: ...

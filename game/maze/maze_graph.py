@@ -10,7 +10,8 @@ class Direction(Enum):
     LEFT = 3
 
 
-def generate_maze_graph(size: int, np_random: np.random.Generator):
+def generate_maze_graph(size: int, seed: int):
+    np_random = np.random.default_rng(seed)
     total_cells_amount = size * size
     # size more than total cells amount because it does not only contain cells but also stop sequence and such
     # Size in most cases smaller but just incase (worst case scenario total_cells_amount*2-1)
