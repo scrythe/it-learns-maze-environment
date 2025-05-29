@@ -31,11 +31,14 @@ class MazeEnv(gym.Env):
         if self.screen is None:
             pygame.init()
             pygame.display.init()
+            self.game.maze_renderer.reset(self.game.maze_structure)
+            self.game.rect = self.game.maze_renderer.image.get_rect()
+            self.game.rect.width *= 2
             self.screen = pygame.display.set_mode(
                 (self.game.rect.width, self.game.rect.height)
             )
-        if self.clock is None:
             self.clock = pygame.Clock()
+
         pygame.event.pump()
         self.game.draw(self.screen)
         self.clock.tick(self.metadata["render_fps"])

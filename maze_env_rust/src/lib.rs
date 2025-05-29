@@ -126,9 +126,8 @@ impl Raycaster {
     }
 }
 
-/// A Python module implemented in Rust.
 #[pymodule]
-fn rust_raycaster(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn maze_env_rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Raycaster>()?;
     Ok(())
 }

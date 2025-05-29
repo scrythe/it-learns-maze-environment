@@ -12,9 +12,11 @@ class Player:
         pygame.draw.circle(self.image, "Red", (self.radius, self.radius), self.radius)
         self.image.set_colorkey("Black")
         self.rect = self.image.get_frect()
+        self.angle = 0
+        self.rect.topleft = (40, 40)
 
     def reset(self):
-        self.rect.topleft = (120, 120)
+        self.rect.topleft = (40, 40)
         self.angle = 0
 
     def step(self, action: int):

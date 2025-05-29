@@ -5,7 +5,7 @@ from .player import Player
 from .maze import WALL
 import math
 from line_profiler import profile
-from rust_raycaster import Raycaster
+from maze_env_rust import Raycaster
 import numpy as np
 
 # from .outdated_raycaster import Raycaster
@@ -26,30 +26,29 @@ class Game:
         )
         # self.raycaster = Raycaster(self.cell_width, self.rays_amount, self.fov)
         self.raycaster = Raycaster(self.cell_width, self.rays_amount, self.fov)
+        self.rect = pygame.Rect()
 
     def draw_3d(self, screen: pygame.Surface):
-        if hasattr(self, "rays"):
-            x = self.rect.width / 2 + self.ray_width_step / 2
-            for ray in self.rays:
-                object_length = min(self.object_height_factor / ray, self.rect.height)
-                y = self.rect.height / 2 - object_length / 2
-                pygame.draw.line(
-                    screen,
-                    "Green",
-                    (x, y),
-                    (x, y + object_length),
-                    math.ceil(self.ray_width_step),
-                )
-                x += self.ray_width_step
+        x = self.rect.width / 2 + self.ray_width_step / 2
+        for ray in self.rays:
+            object_length = min(self.object_height_factor / ray, self.rect.height)
+            y = self.rect.height / 2 - object_length / 2
+            pygame.draw.line(
+                screen,
+                "Green",
+                (x, y),
+                (x, y + object_length),
+                math.ceil(self.ray_width_step),
+            )
+            x += self.ray_width_step
 
+    @profile
     def reset(self, size: int, np_random: np.random.Generator):
         self.maze_structure = generate_maze_structure(size, np_random)
-        self.maze_renderer.reset(self.maze_structure)
         self.raycaster.reset(self.maze_structure)
-        self.rect = self.maze_renderer.image.get_rect()
-        self.rect.width *= 2
-        self.ray_width_step = (self.rect.width / 2) / self.rays_amount
-        self.object_height_factor = self.rect.height * self.player_radius
+        maze_width = self.cell_width * len(self.maze_structure)
+        self.ray_width_step = (maze_width) / self.rays_amount
+        self.object_height_factor = maze_width * self.player_radius
         self.player.reset()
 
     def _get_obs(self):
@@ -58,7 +57,7 @@ class Game:
         )
         return np.array(self.rays, dtype=np.float32)
 
-    @profile
+    # @profile
     def step(self, action: int):
         self.player.step(action)
         collision = self.collision_detection()

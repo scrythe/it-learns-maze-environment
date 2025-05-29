@@ -7,7 +7,7 @@ from pyinstrument import Profiler
 if __name__ == "__main__":
     env = gym.make("it-learns-mazes-v0", render_mode="human")
     for i in range(5):
-        env.reset(seed=i)
+        env.reset(seed=i, options={"size": 10})
         terminated = False
         truncated = False
         while not terminated and not truncated:
