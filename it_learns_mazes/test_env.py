@@ -14,7 +14,7 @@ def test_maze_seed_reset():
     maze_structure = env.unwrapped.game.maze_structure
     env.reset(seed=5, options={"size": 3})
     second_maze_structure = env.unwrapped.game.maze_structure
-    assert (maze_structure == second_maze_structure).all()
+    assert maze_structure == second_maze_structure
 
 
 def test_environment_seed_reset():

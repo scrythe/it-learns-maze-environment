@@ -20,12 +20,11 @@ class Raycaster:
             self.ray_angle_substraction = self.fov / 2
 
     def reset(self, maze_structure: npt.NDArray):
-        self.maze_structure = maze_structure
+        self.maze_structure = np.array(maze_structure)
 
     # @profile
     def cast_multiple_rays(self, player_pos: tuple[float, float], player_angle: float):
         rays_length = []
-        rays_pos = []
         ray_angle = player_angle - self.ray_angle_substraction
         player_pos_normalised = np.array(player_pos) / 40
         player_maze_pos = np.array(
@@ -39,10 +38,9 @@ class Raycaster:
                 player_angle,
                 ray_angle,
             )
-            rays_length.append(ray[0])
-            rays_pos.append(ray[1])
+            rays_length.append(ray)
             ray_angle += self.angle_step
-        return rays_length, rays_pos
+        return rays_length
 
     # @profile
     def cast_single_ray(
@@ -101,7 +99,6 @@ class Raycaster:
             if self.maze_structure[ray_maze_pos[1], ray_maze_pos[0]] == WALL:
                 collision = True
         ray_length *= self.cell_width
-        ray_end = player_pos + ray_length * np.array([ray_dir_x, ray_dir_y])
         no_fish_angle = player_angle - ray_angle
         no_fish_length = math.cos(no_fish_angle) * ray_length
-        return no_fish_length, ray_end
+        return no_fish_length

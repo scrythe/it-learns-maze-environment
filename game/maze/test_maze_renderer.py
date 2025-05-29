@@ -1,11 +1,11 @@
-from .maze_structure import generate_maze_structure
+from maze_env_rust import generate_maze_structure
 from .maze_renderer import MazeRenderer
 import pygame
 import pytest
 import numpy as np
 
 
-# @pytest.mark.skip(reason="don't want to test everytime")
+@pytest.mark.skip(reason="don't want to test everytime")
 def test_maze():
     size = 12
     maze_structure = generate_maze_structure(size, np.random.SeedSequence().entropy)

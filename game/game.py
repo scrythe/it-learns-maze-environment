@@ -1,11 +1,13 @@
 import pygame
-from .maze import generate_maze_structure
+
+# from .maze.old_maze_structure import generate_maze_structure
 from .maze import MazeRenderer
 from .player import Player
 from .maze import WALL
 import math
 from line_profiler import profile
-from maze_env_rust import Raycaster
+
+from maze_env_rust import Raycaster, generate_maze_structure
 import numpy as np
 
 # from .outdated_raycaster import Raycaster
@@ -72,22 +74,22 @@ class Game:
         # Check colliding with right cell
         # Should maybe check if index out of range, but unlikely to happen
         # because of borders
-        if self.maze_structure[y_pos, x_pos + 1] == WALL:
+        if self.maze_structure[y_pos][x_pos + 1] == WALL:
             if int(self.player.rect.right / self.cell_width) == x_pos + 1:
                 return True
                 # self.player.rect.right = (x_pos + 1) * self.cell_width
         # Check colliding with left cell
-        if self.maze_structure[y_pos, x_pos - 1] == WALL:
+        if self.maze_structure[y_pos][x_pos - 1] == WALL:
             if int(self.player.rect.left / self.cell_width) == x_pos - 1:
                 return True
                 # self.player.rect.left = x_pos * self.cell_width
         # Check colliding with above cell
-        if self.maze_structure[y_pos - 1, x_pos] == WALL:
+        if self.maze_structure[y_pos - 1][x_pos] == WALL:
             if int(self.player.rect.top / self.cell_width) == y_pos - 1:
                 return True
                 # self.player.rect.top = y_pos * self.cell_width
         # Check colliding with below cell
-        if self.maze_structure[y_pos + 1, x_pos] == WALL:
+        if self.maze_structure[y_pos + 1][x_pos] == WALL:
             if int(self.player.rect.bottom / self.cell_width) == y_pos + 1:
                 return True
                 # self.player.rect.bottom = (y_pos + 1) * self.cell_width
