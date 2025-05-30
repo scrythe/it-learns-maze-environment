@@ -1,5 +1,5 @@
 from maze_env_rust import Raycaster
-from .maze import generate_maze_structure
+from maze_env_rust import generate_maze_structure
 import math
 import numpy as np
 

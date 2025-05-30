@@ -1,7 +1,6 @@
 import it_learns_mazes
 import gymnasium as gym
 import pygame
-from pyinstrument import Profiler
 
 
 if __name__ == "__main__":

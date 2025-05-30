@@ -5,7 +5,6 @@ from .maze import MazeRenderer
 from .player import Player
 from .maze import WALL
 import math
-from line_profiler import profile
 
 from maze_env_rust import Raycaster, generate_maze_structure
 import numpy as np
@@ -20,6 +19,7 @@ class Game:
     player_movement_speed = 2
     rays_amount = 6
     fov = 1 / 2 * math.pi  # 90 degrees
+    total_life_time = 500
 
     def __init__(self):
         self.maze_renderer = MazeRenderer(self.cell_width)
@@ -29,6 +29,7 @@ class Game:
         # self.raycaster = Raycaster(self.cell_width, self.rays_amount, self.fov)
         self.raycaster = Raycaster(self.cell_width, self.rays_amount, self.fov)
         self.rect = pygame.Rect()
+        # self.life_time = total_life_time
 
     def draw_3d(self, screen: pygame.Surface):
         x = self.rect.width / 2 + self.ray_width_step / 2
@@ -47,11 +48,16 @@ class Game:
     # @profile
     def reset(self, size: int, seed: int):
         self.maze_structure = generate_maze_structure(size, seed)
+        if pygame.display.get_init():
+            self.maze_renderer.reset(self.maze_structure)
+            self.rect = self.maze_renderer.image.get_rect()
+            self.rect.width *= 2
         self.raycaster.reset(self.maze_structure)
         maze_width = self.cell_width * len(self.maze_structure)
         self.ray_width_step = (maze_width) / self.rays_amount
         self.object_height_factor = maze_width * self.player_radius
         self.player.reset()
+        self.life_time = self.total_life_time
 
     def _get_obs(self):
         self.rays = self.raycaster.cast_multiple_rays(
@@ -65,6 +71,9 @@ class Game:
         collision = self.collision_detection()
         obs = self._get_obs()
         terminated = collision
+        self.life_time -= 1
+        if self.life_time <= 0:
+            terminated = True
         return obs, terminated
 
     def collision_detection(self):
