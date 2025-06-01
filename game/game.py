@@ -3,7 +3,7 @@ import pygame
 # from .maze.old_maze_structure import generate_maze_structure
 from .maze import MazeRenderer
 from .player import Player
-from .maze import WALL
+from .maze import WALL, PATH
 import math
 
 from maze_env_rust import Raycaster, generate_maze_structure
@@ -19,7 +19,7 @@ class Game:
     player_movement_speed = 2
     rays_amount = 6
     fov = 1 / 2 * math.pi  # 90 degrees
-    total_life_time = 500
+    total_life_time = 50
 
     def __init__(self):
         self.maze_renderer = MazeRenderer(self.cell_width)
@@ -58,23 +58,35 @@ class Game:
         self.object_height_factor = maze_width * self.player_radius
         self.player.reset()
         self.life_time = self.total_life_time
-
-    def _get_obs(self):
         self.rays = self.raycaster.cast_multiple_rays(
             self.player.rect.center, self.player.angle
         )
-        return np.array(self.rays, dtype=np.float32)
+        maze_structure_size = len(self.maze_structure)
+        self.visited_cells = np.zeros(
+            (maze_structure_size, maze_structure_size), dtype=np.bool
+        )
+        self.collision = False
 
     # @profile
     def step(self, action: int):
         self.player.step(action)
-        collision = self.collision_detection()
-        obs = self._get_obs()
-        terminated = collision
+        self.collision = self.collision_detection()
+        new_path = self.check_new_path()
+        if new_path:
+            self.life_time += 35
+        self.rays = self.raycaster.cast_multiple_rays(
+            self.player.rect.center, self.player.angle
+        )
         self.life_time -= 1
-        if self.life_time <= 0:
-            terminated = True
-        return obs, terminated
+        return new_path
+
+    def check_new_path(self):
+        x_pos = int(self.player.rect.centerx / self.cell_width)
+        y_pos = int(self.player.rect.centery / self.cell_width)
+        if self.maze_structure[y_pos][x_pos] == PATH:
+            if not self.visited_cells[y_pos][x_pos]:
+                self.visited_cells[y_pos][x_pos] = True
+                return True
 
     def collision_detection(self):
         x_pos = int(self.player.rect.centerx / self.cell_width)

@@ -18,6 +18,11 @@ class MazeEnv(gym.Env):
             low=0, high=self.game.cell_width * 20, shape=(6,), dtype=np.float32
         )
         self.action_space = spaces.Discrete(2)
+        self.current_episode = 0
+
+        if render_mode == "human":
+            pygame.init()
+            pygame.display.init()
 
     def reset(self, seed=None, options={"size": 5}):
         super().reset(seed=seed)
@@ -25,7 +30,7 @@ class MazeEnv(gym.Env):
             options = {"size": 5}
         self.game.reset(options["size"], self.np_random_seed)
         info = {}
-        return self.game._get_obs(), info
+        return self._get_obs(), info
 
     def render(self):
         if self.screen is None:
@@ -43,11 +48,27 @@ class MazeEnv(gym.Env):
         self.game.draw(self.screen)
         self.clock.tick(self.metadata["render_fps"])
 
+    def _get_obs(self):
+        return np.array(self.game.rays)
+
     def step(self, action):
-        obs, terminated = self.game.step(action)
+        terminated = False
         reward = 0
         truncated = False
         info = {}
+        new_path = self.game.step(action)
+
+        if self.game.collision:
+            terminated = True
+            reward -= 5
+        if self.game.life_time <= 0:
+            terminated = True
+            reward -= 5
+
+        if new_path:
+            reward += 5
+
+        obs = self._get_obs()
 
         if self.render_mode == "human":
             self.render()

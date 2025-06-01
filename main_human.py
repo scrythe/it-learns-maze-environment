@@ -10,8 +10,6 @@ if __name__ == "__main__":
         terminated = False
         truncated = False
         while not terminated and not truncated:
-            pygame.init()
-            pygame.display.init()
             keys = pygame.key.get_pressed()
             action = 3
             if keys[pygame.K_a]:
