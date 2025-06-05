@@ -1,6 +1,5 @@
 import pygame
 
-# from .maze.old_maze_structure import generate_maze_structure
 from .maze import MazeRenderer
 from .player import Player
 from .maze import WALL, PATH
@@ -8,8 +7,6 @@ import math
 
 from maze_env_rust import Raycaster, generate_maze_structure
 import numpy as np
-
-# from .outdated_raycaster import Raycaster
 
 
 class Game:
@@ -47,7 +44,7 @@ class Game:
 
     # @profile
     def reset(self, size: int, seed: int):
-        self.maze_structure = generate_maze_structure(size, seed)
+        self.maze_structure, maze_start = generate_maze_structure(size, seed)
         if pygame.display.get_init():
             self.maze_renderer.reset(self.maze_structure)
             self.rect = self.maze_renderer.image.get_rect()
@@ -56,7 +53,8 @@ class Game:
         maze_width = self.cell_width * len(self.maze_structure)
         self.ray_width_step = (maze_width) / self.rays_amount
         self.object_height_factor = maze_width * self.player_radius
-        self.player.reset()
+        start = [maze_start[0] * self.cell_width, maze_start[1] * self.cell_width]
+        self.player.reset(start)
         self.life_time = self.total_life_time
         self.rays = self.raycaster.cast_multiple_rays(
             self.player.rect.center, self.player.angle

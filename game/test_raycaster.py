@@ -6,7 +6,7 @@ import numpy as np
 
 def test_raycaster():
     raycaster = Raycaster(40, 90, 3)
-    maze_structure = generate_maze_structure(5, 0)
+    maze_structure, start = generate_maze_structure(5, 0)
     raycaster.reset(maze_structure)
     raycaster.cast_multiple_rays(
         (40.5, 40.5),

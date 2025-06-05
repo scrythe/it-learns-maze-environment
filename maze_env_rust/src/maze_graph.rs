@@ -1,16 +1,9 @@
-use pyo3::prelude::*;
-use rand::{rngs, Rng, SeedableRng};
+use rand::{rngs, Rng};
 
 const VISITED: bool = true;
 const UNVISITED: bool = false;
 
-#[pyfunction]
-pub fn generate_maze_graph(size: usize, np_seed: u128) -> Vec<[i32; 2]> {
-    let mut seed = [0u8; 32];
-    let np_seed = np_seed.to_be_bytes();
-    seed[..16].copy_from_slice(&np_seed);
-    let mut rng = rngs::StdRng::from_seed(seed);
-
+pub fn generate_maze_graph(rng: &mut rngs::StdRng, size: usize) -> Vec<[i32; 2]> {
     let total_cells_amount = size * size;
     let mut maze_graph: Vec<[i32; 2]> = vec![[0; 2]; total_cells_amount * 3];
     let mut visited_cells = vec![vec![false; size]; size];
@@ -24,7 +17,7 @@ pub fn generate_maze_graph(size: usize, np_seed: u128) -> Vec<[i32; 2]> {
     while visited_cells_index < total_cells_amount {
         let mut current_sub_graph_cells: Vec<Vec<bool>> = vec![vec![false; size]; size];
         let mut current_cell = create_rand_unvisited_cell(
-            &mut rng,
+            rng,
             total_cells_amount,
             &visited_cells,
             visited_cells_index,
@@ -39,7 +32,7 @@ pub fn generate_maze_graph(size: usize, np_seed: u128) -> Vec<[i32; 2]> {
         );
 
         loop {
-            let rand_direction = get_random_direction(&mut rng, size, current_cell);
+            let rand_direction = get_random_direction(rng, size, current_cell);
             let new_cell = create_cell_goto_direction(current_cell, rand_direction);
             if check_cell_inside(new_cell, &current_sub_graph_cells) {
                 reverse_graph_to_cell(
@@ -178,6 +171,8 @@ fn reverse_graph_to_cell(
 
 #[cfg(test)]
 mod tests {
+    use rand::SeedableRng;
+
     use super::*;
 
     #[test]
@@ -205,6 +200,7 @@ mod tests {
 
     #[test]
     fn test_generate_maze_graph() {
-        generate_maze_graph(5, 0);
+        let mut rng = rngs::StdRng::from_os_rng();
+        generate_maze_graph(&mut rng, 5);
     }
 }

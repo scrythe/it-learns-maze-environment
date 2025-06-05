@@ -1,6 +1,6 @@
 import numpy.typing as npt
 import pygame
-from .constants import PATH
+from .constants import PATH, GOAL
 
 
 class MazeRenderer:
@@ -26,6 +26,8 @@ class MazeRenderer:
             for cell in row:
                 if cell == PATH:
                     self.image.blit(self.path, self.current_rect)
+                elif cell == GOAL:
+                    self.image.blit(self.goal, self.current_rect)
                 else:
                     self.image.blit(self.wall, self.current_rect)
                 self.current_rect.x += self.cell_width

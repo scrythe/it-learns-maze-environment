@@ -15,8 +15,8 @@ class Player:
         self.angle = 0
         self.rect.topleft = (40, 40)
 
-    def reset(self):
-        self.rect.topleft = (40, 40)
+    def reset(self, start: list[int]):
+        self.rect.topleft = start
         self.angle = 0
 
     def step(self, action: int):

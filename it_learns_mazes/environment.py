@@ -49,7 +49,7 @@ class MazeEnv(gym.Env):
         self.clock.tick(self.metadata["render_fps"])
 
     def _get_obs(self):
-        return np.array(self.game.rays)
+        return np.array(self.game.rays, dtype=np.float32)
 
     def step(self, action):
         terminated = False
